@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProfileType {
+  first_time_voter
+  student
+  educator
+  general
+}
+
+model User {
+  id                   String      @id @default(uuid())
+  email                String      @unique
+  username             String      @unique
+  passwordHash         String      @map("password_hash")
+  profileType          ProfileType @default(general) @map("profile_type")
+  country              String?
+  languagePreference   String      @default("en") @map("language_preference")
+  accessibilitySettings Json?      @map("accessibility_settings")
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime    @updatedAt @map("updated_at")
+
+  progress   LearningProgress[]
+  responses  QuizResponse[]
+  bookmarks  Bookmark[]
+  tokens     RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
+}
+
+model Module {
+  id              String   @id @default(uuid())
+  title           String
+  slug            String   @unique
+  description     String
+  type            String   // timeline, process, quiz, faq
+  difficultyLevel Int      @default(1) @map("difficulty_level")
+  durationMinutes Int      @default(10) @map("duration_minutes")
+  content         Json
+  tags            String[]
+  orderIndex      Int      @default(0) @map("order_index")
+  isPublished     Boolean  @default(true) @map("is_published")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  progress  LearningProgress[]
+  quizzes   Quiz[]
+  bookmarks Bookmark[]
+
+  @@map("modules")
+}
+
+model LearningProgress {
+  id                   String    @id @default(uuid())
+  userId               String    @map("user_id")
+  moduleId             String    @map("module_id")
+  completionPercentage Int       @default(0) @map("completion_percentage")
+  startedAt            DateTime  @default(now()) @map("started_at")
+  completedAt          DateTime? @map("completed_at")
+  timeSpentSeconds     Int       @default(0) @map("time_spent_seconds")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@map("learning_progress")
+}
+
+model TimelineEvent {
+  id               String   @id @default(uuid())
+  title            String
+  description      String
+  eventDate        DateTime @map("event_date")
+  eventType        String   @map("event_type") // registration, campaign, voting, counting, results
+  importanceLevel  Int      @default(1) @map("importance_level")
+  country          String   @default("general")
+  relatedModuleIds String[] @map("related_module_ids")
+  color            String?
+  icon             String?
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("timeline_events")
+}
+
+model Quiz {
+  id          String         @id @default(uuid())
+  moduleId    String?        @map("module_id")
+  title       String
+  description String
+  passingScore Int           @default(70) @map("passing_score")
+  timeLimit   Int?           @map("time_limit") // seconds, null = no limit
+  isPublished Boolean        @default(true) @map("is_published")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  module    Module?          @relation(fields: [moduleId], references: [id])
+  questions QuizQuestion[]
+  responses QuizResponse[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id            String   @id @default(uuid())
+  quizId        String   @map("quiz_id")
+  questionText  String   @map("question_text")
+  questionType  String   @default("multiple_choice") @map("question_type")
+  options       Json     // [{id, text, isCorrect}]
+  explanation   String?
+  orderIndex    Int      @default(0) @map("order_index")
+
+  quiz      Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  responses QuizResponse[]
+
+  @@map("quiz_questions")
+}
+
+model QuizResponse {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  quizId          String   @map("quiz_id")
+  questionId      String   @map("question_id")
+  userAnswer      String   @map("user_answer")
+  isCorrect       Boolean  @map("is_correct")
+  score           Int?
+  attemptNumber   Int      @default(1) @map("attempt_number")
+  submittedAt     DateTime @default(now()) @map("submitted_at")
+
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz     Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_responses")
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  moduleId  String   @map("module_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@map("bookmarks")
+}
+
+model FaqItem {
+  id         String   @id @default(uuid())
+  question   String
+  answer     String
+  category   String
+  orderIndex Int      @default(0) @map("order_index")
+  isPublished Boolean @default(true) @map("is_published")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("faq_items")
+}
+
+model GlossaryTerm {
+  id         String   @id @default(uuid())
+  term       String   @unique
+  definition String
+  example    String?
+  category   String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("glossary_terms")
+}
