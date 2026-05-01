@@ -25,21 +25,22 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6 bg-[radial-gradient(ellipse_at_bottom,_var(--primary-glow)_0%,_transparent_50%)]">
-      <div className="w-full max-w-[450px] animate-fade-in">
-        <Link to="/" className="inline-flex items-center gap-2 text-text-muted hover:text-white mb-8 transition-colors text-sm font-medium">
-          <ArrowLeft size={16} /> Back to platform
+    <div className="min-h-[calc(100vh-72px)] flex items-center justify-center p-[24px] bg-bg-deep">
+      <div className="w-full max-w-[480px] animate-fade-in">
+        <Link to="/" className="inline-flex items-center gap-[8px] text-text-muted hover:text-white mb-[32px] transition-colors text-[14px] font-bold">
+          <ArrowLeft size={16} /> BACK TO PLATFORM
         </Link>
 
-        <div className="glass-card p-10 border-white/5 shadow-2xl">
-          <div className="mb-10 text-center">
-            <h1 className="text-4xl font-black mb-2">Welcome Back</h1>
-            <p className="text-text-muted text-sm">Continue your journey to political literacy</p>
+        {/* Solid Card - 40px Padding */}
+        <div className="card p-[40px] shadow-2xl">
+          <div className="mb-[32px] text-center">
+            <h2 className="mb-[8px] text-white">Welcome Back</h2>
+            <p className="text-body text-text-muted">Continue your journey to political literacy</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Username</label>
+          <form onSubmit={handleSubmit} className="space-y-[24px] text-left">
+            <div>
+              <label className="label">Username</label>
               <div className="relative">
                 <input 
                   type="text" 
@@ -47,16 +48,16 @@ const LoginPage = () => {
                   onChange={(e) => setFormData({...formData, username: e.target.value})}
                   placeholder="Enter username" 
                   required
-                  className="pl-12"
+                  className="pl-[48px]"
                 />
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                <Mail className="absolute left-[16px] top-1/2 -translate-y-1/2 text-text-dim" size={18} />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black uppercase tracking-widest text-text-muted">Password</label>
-                <a href="#" className="text-[10px] font-bold text-primary hover:underline">Forgot?</a>
+            <div>
+              <div className="flex justify-between items-center mb-[8px]">
+                <label className="label mb-0">Password</label>
+                <a href="#" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">Forgot?</a>
               </div>
               <div className="relative">
                 <input 
@@ -65,29 +66,31 @@ const LoginPage = () => {
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
                   placeholder="••••••••" 
                   required
-                  className="pl-12"
+                  className="pl-[48px]"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                <Lock className="absolute left-[16px] top-1/2 -translate-y-1/2 text-text-dim" size={18} />
               </div>
             </div>
 
-            {error && <p className="text-red-400 text-sm text-center font-medium bg-red-400/10 py-3 rounded-lg border border-red-400/20">{error}</p>}
+            {error && <p className="text-red-400 text-[14px] text-center font-bold bg-red-400/10 py-[16px] rounded-[8px] border border-red-400/20">{error}</p>}
 
-            <button type="submit" disabled={isLoading} className="w-full btn-primary py-4.5 text-lg shadow-lg disabled:opacity-50">
-              {isLoading ? 'Signing in...' : 'Sign In'} <ArrowRight size={20} className="ml-2" />
-            </button>
+            <div className="pt-[8px]">
+              <button type="submit" disabled={isLoading} className="w-full btn btn-primary h-[48px] uppercase font-black tracking-widest">
+                {isLoading ? 'SIGNING IN...' : 'LOG IN TO DASHBOARD'} <ArrowRight size={20} className="ml-2" />
+              </button>
+            </div>
           </form>
 
-          <div className="text-center mt-8">
-            <p className="text-sm text-text-muted">
+          <div className="text-center mt-[32px] pt-[24px] border-t border-border">
+            <p className="text-[14px] text-text-muted">
               Don't have an account? {' '}
-              <Link to="/register" className="text-primary font-bold hover:underline">Create one free</Link>
+              <Link to="/register" className="text-primary font-black hover:underline">CREATE ONE FREE</Link>
             </p>
           </div>
         </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-[10px] font-black text-text-dim uppercase tracking-[0.2em]">Secured by ElectionLearn Infrastructure</p>
+        <div className="mt-[48px] text-center">
+          <p className="text-[10px] font-black text-text-dim uppercase tracking-[0.3em]">Secured by ElectionLearn Infrastructure</p>
         </div>
       </div>
     </div>
